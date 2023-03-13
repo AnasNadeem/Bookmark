@@ -1,3 +1,10 @@
+import jwt
+
+from django.conf import settings
+from rest_framework import response, status
+from rest_framework.decorators import action
+from rest_framework.viewsets import ModelViewSet
+
 from .serializers import (
     BookmarkSerializer,
     PlatformSerializer,
@@ -12,10 +19,10 @@ from .serializers import (
     UserSerializer,
 )
 from bookmark_app.models import (User, Bookmark, Platform, Tag)
-
-from rest_framework import response, status
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet
+from utils.helper_functions import send_or_verify_otp
+from utils.permissions import (IsAuthenticated,
+                               UserPermission,
+                               )
 
 
 class UserViewset(ModelViewSet):
@@ -118,7 +125,6 @@ class UserViewset(ModelViewSet):
             serializer.save()
             return response.Response("password changed successfully ", status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class PlatformViewSet(ModelViewSet):
