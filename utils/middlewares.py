@@ -9,9 +9,5 @@ class LoginMiddleware(object):
         if not request.user.is_authenticated:
             JWTAuthentication().authenticate(request)
 
-        if (not request.user) or (not request.user.is_authenticated):
-            response = self.get_response(request)
-            return response
-
         response = self.get_response(request)
         return response
