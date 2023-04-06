@@ -40,6 +40,13 @@ class ConstantMixin(object):
         token = login_resp.json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=token)
 
+    def create_tag(self, name, user_id, verify=True):
+        tag_data = {"name": name, "user": user_id}
+        resp = self.client.post(self.TAG_URL, tag_data, format="json")
+        if verify:
+            self.assertEqual(resp.status_code, 201)
+        return resp
+
     def create_bookmark(self, url, title, site_id, tags, user_id, verify=True):
         bookmark_data = {
             "url": url,

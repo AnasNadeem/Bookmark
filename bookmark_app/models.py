@@ -76,6 +76,7 @@ class Bookmark(TimeBaseModel):
 
     class Meta:
         unique_together = ('url', 'user')
+        ordering = ['-created']
 
     def __str__(self):
         return f"{self.site}: {self.title}"

@@ -6,8 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
 from .serializers import (
+    # Bookmark
     BookmarkSerializer,
+    BookmarkSerializerWithoutTagSerializer,
+    # Site
     SiteSerializer,
+    # Tag
     TagSerializer,
     # User
     ChangePasswordSerializer,
@@ -135,8 +139,17 @@ class SiteViewSet(ModelViewSet):
 class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (UserPermission,)
+
+    @action(detail=True, methods=['get'])
+    def bookmarks(self, request, pk=None):
+        tag = self.get_object()
+        bookmarks = tag.bookmarks.all()
+        serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
+        return response.Response(serializer.data)
 
 
 class BookmarkViewSet(ModelViewSet):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
+    permission_classes = (UserPermission,)
