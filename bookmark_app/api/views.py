@@ -29,6 +29,14 @@ from utils.permissions import (IsAuthenticated,
                                )
 
 
+class BaseModelViewSet(ModelViewSet):
+    def _create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return serializer
+
+
 class UserViewset(ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -136,18 +144,15 @@ class SiteViewSet(ModelViewSet):
     serializer_class = SiteSerializer
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(BaseModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (UserPermission,)
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return response.Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        serializer = self._create(request, *args, **kwargs)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['get'])
     def bookmarks(self, request, pk=None):
