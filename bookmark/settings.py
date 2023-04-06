@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third Party Apps
     'rest_framework',
+    'corsheaders',
     # Our apps
     'bookmark_app',
 ]
@@ -59,6 +60,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'utils.middlewares.LoginMiddleware',
 ]
 
@@ -86,6 +89,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+CORS_URLS_REGEX = r"^/api/.*$"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
