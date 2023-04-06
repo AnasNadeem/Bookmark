@@ -25,22 +25,14 @@ class TestTag(APITestCase, ConstantMixin):
     ######################
 
     def test_post_without_auth(self):
-        register_resp = self.register_user()
-        user_id = register_resp.json()['id']
-        tag_resp = self.create_tag(
-            user_id=user_id,
-            name='Test',
-        )
+        self.register_user()
+        tag_resp = self.create_tag(name='Test', verify=False)
         self.assertEqual(tag_resp.status_code, 403)
         self.assertEqual(Tag.objects.all().count(), 0)
 
     def test_post_with_auth(self):
-        register_resp = self.register_user()
-        user_id = register_resp.json()['id']
+        self.register_user()
         self.login_user()
-        tag_resp = self.create_tag(
-            user_id=user_id,
-            name='Test',
-        )
+        tag_resp = self.create_tag(name='Test', verify=False)
         self.assertEqual(tag_resp.status_code, 201)
         self.assertEqual(Tag.objects.all().count(), 1)

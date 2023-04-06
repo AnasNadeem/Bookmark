@@ -40,8 +40,8 @@ class ConstantMixin(object):
         token = login_resp.json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=token)
 
-    def create_tag(self, name, user_id, verify=True):
-        tag_data = {"name": name, "user": user_id}
+    def create_tag(self, name, verify=True):
+        tag_data = {"name": name}
         resp = self.client.post(self.TAG_URL, tag_data, format="json")
         if verify:
             self.assertEqual(resp.status_code, 201)
