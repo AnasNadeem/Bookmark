@@ -2,7 +2,7 @@ from django.contrib.auth import password_validation
 from django.utils.translation import gettext_lazy as _
 
 from rest_framework import serializers
-from bookmark_app.models import (User, Platform, Tag, Bookmark)
+from bookmark_app.models import (User, Site, Tag, Bookmark)
 
 
 ######################
@@ -99,10 +99,10 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user
 
 
-class PlatformSerializer(serializers.ModelSerializer):
+class SiteSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Platform
+        model = Site
         fields = '__all__'
 
 
