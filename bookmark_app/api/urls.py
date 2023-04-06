@@ -2,7 +2,7 @@ from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 from .views import (
     BookmarkViewSet,
-    PlatformViewSet,
+    SiteViewSet,
     TagViewSet,
     UserViewset,
 )
@@ -10,7 +10,7 @@ from .views import (
 
 router = routers.SimpleRouter(trailing_slash=False)
 router.register(r"bookmark", BookmarkViewSet, basename="bookmark")
-router.register(r"platform", PlatformViewSet, basename="platform")
+router.register(r"site", SiteViewSet, basename="site")
 router.register(r"tag", TagViewSet, basename="tag")
 router.register(r"user", UserViewset, basename="user")
 

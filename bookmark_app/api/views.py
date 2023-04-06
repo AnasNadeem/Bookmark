@@ -7,7 +7,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .serializers import (
     BookmarkSerializer,
-    PlatformSerializer,
+    SiteSerializer,
     TagSerializer,
     # User
     ChangePasswordSerializer,
@@ -18,7 +18,7 @@ from .serializers import (
     UserEmailSerializer,
     UserSerializer,
 )
-from bookmark_app.models import (User, Bookmark, Platform, Tag)
+from bookmark_app.models import (User, Bookmark, Site, Tag)
 from utils.helper_functions import send_or_verify_otp
 from utils.permissions import (IsAuthenticated,
                                UserPermission,
@@ -127,9 +127,9 @@ class UserViewset(ModelViewSet):
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class PlatformViewSet(ModelViewSet):
-    queryset = Platform.objects.all()
-    serializer_class = PlatformSerializer
+class SiteViewSet(ModelViewSet):
+    queryset = Site.objects.all()
+    serializer_class = SiteSerializer
 
 
 class TagViewSet(ModelViewSet):
