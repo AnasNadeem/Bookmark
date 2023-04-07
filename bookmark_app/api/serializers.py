@@ -8,8 +8,6 @@ from bookmark_app.models import (User, Site, Tag, Bookmark)
 ######################
 # ---- USER ---- #
 ######################
-
-
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -98,6 +96,9 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user
 
 
+######################
+# ---- SITE ---- #
+######################
 class SiteSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -105,6 +106,9 @@ class SiteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+######################
+# ---- TAG ---- #
+######################
 class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -112,8 +116,18 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+######################
+# ---- BOOKMARK ---- #
+######################
 class BookmarkSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Bookmark
+        fields = '__all__'
+
+
+class BookmarkSerializerWithoutTagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bookmark

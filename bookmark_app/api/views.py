@@ -6,8 +6,12 @@ from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 
 from .serializers import (
+    # Bookmark
     BookmarkSerializer,
+    BookmarkSerializerWithoutTagSerializer,
+    # Site
     SiteSerializer,
+    # Tag
     TagSerializer,
     # User
     ChangePasswordSerializer,
@@ -23,6 +27,14 @@ from utils.helper_functions import send_or_verify_otp
 from utils.permissions import (IsAuthenticated,
                                UserPermission,
                                )
+
+
+class BaseModelViewSet(ModelViewSet):
+    def _create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return serializer
 
 
 class UserViewset(ModelViewSet):
@@ -132,11 +144,25 @@ class SiteViewSet(ModelViewSet):
     serializer_class = SiteSerializer
 
 
-class TagViewSet(ModelViewSet):
+class TagViewSet(BaseModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (UserPermission,)
+
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        serializer = self._create(request, *args, **kwargs)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'])
+    def bookmarks(self, request, pk=None):
+        tag = self.get_object()
+        bookmarks = tag.bookmarks.all()
+        serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
+        return response.Response(serializer.data)
 
 
 class BookmarkViewSet(ModelViewSet):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
+    permission_classes = (UserPermission,)
