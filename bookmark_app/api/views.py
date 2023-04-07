@@ -9,8 +9,6 @@ from .serializers import (
     # Bookmark
     BookmarkSerializer,
     BookmarkSerializerWithoutTagSerializer,
-    # Site
-    SiteSerializer,
     # Tag
     TagSerializer,
     # User
@@ -22,7 +20,7 @@ from .serializers import (
     UserEmailSerializer,
     UserSerializer,
 )
-from bookmark_app.models import (User, Bookmark, Site, Tag)
+from bookmark_app.models import (User, Bookmark, Tag)
 from utils.helper_functions import send_or_verify_otp
 from utils.permissions import (IsAuthenticated,
                                UserPermission,
@@ -137,11 +135,6 @@ class UserViewset(ModelViewSet):
             serializer.save()
             return response.Response("password changed successfully ", status=status.HTTP_201_CREATED)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class SiteViewSet(ModelViewSet):
-    queryset = Site.objects.all()
-    serializer_class = SiteSerializer
 
 
 class TagViewSet(BaseModelViewSet):

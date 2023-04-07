@@ -47,15 +47,6 @@ class UserOTP(TimeBaseModel):
         return self.user.email
 
 
-class Site(TimeBaseModel):
-    name = models.CharField(max_length=100, unique=True)
-    url = models.URLField()
-    icon = models.ImageField(upload_to='images/', null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.name}"
-
-
 class Tag(TimeBaseModel):
     name = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -70,7 +61,7 @@ class Tag(TimeBaseModel):
 class Bookmark(TimeBaseModel):
     url = models.URLField()
     title = models.TextField()
-    site = models.ForeignKey(Site, on_delete=models.SET_NULL, null=True, blank=True)
+    site = models.CharField(max_length=100)
     tags = models.ManyToManyField(Tag, related_name='bookmarks', blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 

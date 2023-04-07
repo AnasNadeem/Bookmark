@@ -13,9 +13,6 @@ class ConstantMixin(object):
     USER2_DATA = {"email": DEFAULT_EMAIL2, "password": "Test@1234"}
     PASSWORD_CHANGE_URL = "/api/user/password_change"
 
-    # SiteViewset URLs
-    SITE_URL = "/api/site"
-
     # TagViewSet URLs
     TAG_URL = "/api/tag"
 
@@ -47,11 +44,12 @@ class ConstantMixin(object):
             self.assertEqual(resp.status_code, 201)
         return resp
 
-    def create_bookmark(self, url, title, site_id, tags, user_id, verify=True):
+    def create_bookmark(self, url, title, tags, user_id, verify=True):
+        site = url.split("//")[1].split("/")[0]
         bookmark_data = {
             "url": url,
             "title": title,
-            "site": site_id,
+            "site": site,
             "tags": tags,
             "user": user_id,
         }
