@@ -18,4 +18,4 @@ class IsPartiallyAuthenticated(BasePermission):
 class UserPermission(IsAuthenticated):
 
     def has_object_permission(self, request, view, obj):
-        return obj == request.user
+        return obj.user == request.user
