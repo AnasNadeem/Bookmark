@@ -172,6 +172,8 @@ class BookmarkViewSet(BaseModelViewSet):
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
         for tag in tags:
+            if not isinstance(tag, dict):
+                continue
             name = tag.get('name', '')
             if not name:
                 continue

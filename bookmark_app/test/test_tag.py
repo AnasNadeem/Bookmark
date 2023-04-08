@@ -1,6 +1,6 @@
 import copy
 
-from bookmark_app.models import Tag
+from bookmark_app.models import Bookmark, Tag
 from .test_base import ConstantMixin
 from rest_framework.test import APITestCase
 
@@ -64,3 +64,38 @@ class TestTag(APITestCase, ConstantMixin):
         tag_resp = self.client.delete(f'{self.TAG_URL}/{tag_id}')
         self.assertEqual(tag_resp.status_code, 204)
         self.assertEqual(Tag.objects.all().count(), 0)
+
+    ######################
+    # ---- BOOKMARKS ---- #
+    ######################
+    def test_get_bookmarks(self):
+        self.register_user()
+        self.login_user()
+        tag_resp = self.create_tag(name='search')
+        tag_data = copy.deepcopy(tag_resp.json())
+        tag_id = tag_resp.json()['id']
+        tag_bookmark_resp = self.client.get(f'{self.TAG_URL}/{tag_id}/bookmarks')
+        self.assertEqual(tag_bookmark_resp.status_code, 200)
+        self.assertEqual(tag_bookmark_resp.json(), [])
+
+        self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+            tags=[tag_data]
+        )
+        self.create_bookmark(
+            url='https://www.bing.com',
+            title='Bing Search',
+            tags=[tag_data]
+        )
+        self.create_bookmark(
+            url='https://www.duck.com',
+            title='duckduckgo Search',
+            tags=[]
+        )
+        self.assertEqual(Tag.objects.all().count(), 1)
+        self.assertEqual(Bookmark.objects.all().count(), 3)
+
+        tag_bookmark_resp = self.client.get(f'{self.TAG_URL}/{tag_id}/bookmarks')
+        self.assertEqual(tag_bookmark_resp.status_code, 200)
+        self.assertEqual(len(tag_bookmark_resp.json()), 2)
