@@ -1,3 +1,5 @@
+import copy
+
 from bookmark_app.models import Bookmark, Tag
 from .test_base import ConstantMixin
 from rest_framework.test import APITestCase
@@ -95,3 +97,67 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmrks.count(), 1)
         self.assertEqual(tags.count(), 2)
         self.assertEqual(bookmrks.first().tags.count(), 2)
+
+    ######################
+    # ---- PUT ---- #
+    ######################
+    def test_put_without_auth(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+            verify=False
+        )
+        self.logout_user()
+        bookmark_data = copy.deepcopy(bookmark.json())
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 403)
+        self.assertEqual(Bookmark.objects.first().title, 'Google Search')
+
+    def test_put_with_partial_data(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+
+        partial_bookmark_data = {
+            'url': 'https://www.bing.com',
+            'title': 'Bing Search',
+        }
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=partial_bookmark_data,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 400)
+        bookmark = Bookmark.objects.first()
+        self.assertEqual(bookmark.title, 'Google Search')
+        self.assertEqual(bookmark.site, 'google')
+
+    def test_put_with_full_data(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+
+        bookmark_data = copy.deepcopy(bookmark.json())
+        bookmark_data['url'] = 'https://www.bing.com'
+        bookmark_data['title'] = 'Bing Search'
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 200)
+        bookmark = Bookmark.objects.first()
+        self.assertEqual(bookmark.title, 'Bing Search')
+        self.assertEqual(bookmark.site, 'bing')

@@ -37,6 +37,9 @@ class ConstantMixin(object):
         token = login_resp.json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=token)
 
+    def logout_user(self):
+        self.client.credentials(HTTP_AUTHORIZATION=None)
+
     def create_tag(self, name, verify=True):
         tag_data = {"name": name}
         resp = self.client.post(self.TAG_URL, tag_data, format="json")
@@ -55,4 +58,12 @@ class ConstantMixin(object):
         resp = self.client.post(self.BOOKMARK_URL, bookmark_data, format="json")
         if verify:
             self.assertEqual(resp.status_code, 201)
+        return resp
+
+    def update_bookmark(self, bookmark_id, bookmark_data, verify=True):
+        resp = self.client.put(
+            f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
+        )
+        if verify:
+            self.assertEqual(resp.status_code, 200)
         return resp

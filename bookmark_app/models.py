@@ -26,6 +26,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
+    def save(self, **kwargs):
+        self.clean()
+        return super().save(**kwargs)
+
     def clean(self):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
@@ -73,7 +77,11 @@ class Bookmark(TimeBaseModel):
     def __str__(self):
         return f"{self.site}: {self.title}"
 
-    def clean(self) -> None:
+    def save(self, **kwargs):
+        self.clean()
+        return super().save(**kwargs)
+
+    def clean(self):
         super().clean()
         site = site_extractor(self.url)
         if self.site != site:
