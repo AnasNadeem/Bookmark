@@ -161,3 +161,46 @@ class TestBookmark(APITestCase, ConstantMixin):
         bookmark = Bookmark.objects.first()
         self.assertEqual(bookmark.title, 'Bing Search')
         self.assertEqual(bookmark.site, 'bing')
+
+    ######################
+    # ---- PATCH ---- #
+    ######################
+    def test_patch_without_auth(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+        self.logout_user()
+        bookmark_data = copy.deepcopy(bookmark.json())
+        bookmark_data['title'] = 'Bing Search'
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            patch=True,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 403)
+        self.assertEqual(Bookmark.objects.first().title, 'Google Search')
+
+    def test_patch(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+        bookmark_data = {
+            'title': 'Bing Search',
+        }
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            patch=True,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 200)
+        self.assertEqual(Bookmark.objects.first().title, 'Bing Search')
+        self.assertEqual(Bookmark.objects.first().site, 'google')
+        self.assertEqual(Bookmark.objects.first().url, 'https://www.google.com')

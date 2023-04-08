@@ -60,10 +60,15 @@ class ConstantMixin(object):
             self.assertEqual(resp.status_code, 201)
         return resp
 
-    def update_bookmark(self, bookmark_id, bookmark_data, verify=True):
-        resp = self.client.put(
-            f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
-        )
+    def update_bookmark(self, bookmark_id, bookmark_data, patch=False, verify=True):
+        if patch:
+            resp = self.client.patch(
+                f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
+            )
+        else:
+            resp = self.client.put(
+                f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
+            )
         if verify:
             self.assertEqual(resp.status_code, 200)
         return resp
