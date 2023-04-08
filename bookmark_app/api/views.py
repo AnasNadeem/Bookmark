@@ -162,11 +162,9 @@ class BookmarkViewSet(BaseModelViewSet):
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
-        site = site_extractor(request.data('url', ''))
+        site = site_extractor(request.data.get('url', ''))
         if not site:
             return response.Response({'error': 'Invalid url'}, status=status.HTTP_400_BAD_REQUEST)
-        if request.data('site', '') and (site != request.data('site', '')):
-            return response.Response({'error': 'Site name does not match with url'}, status=status.HTTP_400_BAD_REQUEST)
         request.data['site'] = site
         serializer = self._create(request, *args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)

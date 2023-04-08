@@ -44,12 +44,14 @@ class ConstantMixin(object):
             self.assertEqual(resp.status_code, 201)
         return resp
 
-    def create_bookmark(self, url, title, tags=[], verify=True):
+    def create_bookmark(self, url, title, site=None, tags=[], verify=True):
         bookmark_data = {
             "url": url,
             "title": title,
             "tags": tags,
         }
+        if site:
+            bookmark_data["site"] = site
         resp = self.client.post(self.BOOKMARK_URL, bookmark_data, format="json")
         if verify:
             self.assertEqual(resp.status_code, 201)
