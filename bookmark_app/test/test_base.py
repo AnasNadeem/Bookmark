@@ -72,3 +72,9 @@ class ConstantMixin(object):
         if verify:
             self.assertEqual(resp.status_code, 200)
         return resp
+
+    def delete_bookmark(self, bookmark_id, verify=True):
+        resp = self.client.delete(f"{self.BOOKMARK_URL}/{bookmark_id}")
+        if verify:
+            self.assertEqual(resp.status_code, 204)
+        return resp

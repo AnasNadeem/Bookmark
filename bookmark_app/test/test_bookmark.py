@@ -204,3 +204,55 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(Bookmark.objects.first().title, 'Bing Search')
         self.assertEqual(Bookmark.objects.first().site, 'google')
         self.assertEqual(Bookmark.objects.first().url, 'https://www.google.com')
+
+    ######################
+    # ---- DELETE ---- #
+    ######################
+    def test_delete_without_auth(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+        self.logout_user()
+        bookmark_resp = self.delete_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 403)
+        self.assertEqual(Bookmark.objects.all().count(), 1)
+
+    def test_delete(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+        bookmark_resp = self.delete_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 204)
+        self.assertEqual(Bookmark.objects.all().count(), 0)
+
+    def test_delete_check_tags(self):
+        self.register_user()
+        self.login_user()
+        self.create_tag(name='tag1')
+        tag1 = {'name': 'tag1'}
+        tag2 = {'name': 'tag2'}
+
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+            tags=[tag1, tag2],
+        )
+        bookmark_resp = self.delete_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 204)
+        self.assertEqual(Bookmark.objects.all().count(), 0)
+        self.assertEqual(Tag.objects.all().count(), 2)
