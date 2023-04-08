@@ -5,13 +5,13 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.contrib.auth import login
 
-from bookmark_app.api.serializers import UserSerializer
-from bookmark_app.models import UserOTP
-
 from rest_framework import status
 
 
 def send_or_verify_otp(request, user, otp=None, resent=False):
+    from bookmark_app.api.serializers import UserSerializer
+    from bookmark_app.models import UserOTP
+
     resp_data = UserSerializer(user).data
     user_otp = UserOTP.objects.filter(user=user).first()
     if not user_otp:

@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from bookmark_app.models_manager import UserManager
+from utils.helper_functions import site_extractor
 
 
 class TimeBaseModel(models.Model):
@@ -71,3 +72,9 @@ class Bookmark(TimeBaseModel):
 
     def __str__(self):
         return f"{self.site}: {self.title}"
+
+    def clean(self) -> None:
+        super().clean()
+        site = site_extractor(self.url)
+        if self.site != site:
+            self.site = site
