@@ -167,4 +167,14 @@ class BookmarkViewSet(BaseModelViewSet):
             return response.Response({'error': 'Invalid url'}, status=status.HTTP_400_BAD_REQUEST)
         request.data['site'] = site
         serializer = self._create(request, *args, **kwargs)
+        tags = request.data.get('tags', [])
+        if not tags:
+            return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        for tag in tags:
+            name = tag.get('name', '')
+            if not name:
+                continue
+            tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
+            serializer.instance.tags.add(tag_obj)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
