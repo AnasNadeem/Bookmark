@@ -37,6 +37,9 @@ class ConstantMixin(object):
         token = login_resp.json()["token"]
         self.client.credentials(HTTP_AUTHORIZATION=token)
 
+    def logout_user(self):
+        self.client.credentials(HTTP_AUTHORIZATION=None)
+
     def create_tag(self, name, verify=True):
         tag_data = {"name": name}
         resp = self.client.post(self.TAG_URL, tag_data, format="json")
@@ -44,16 +47,34 @@ class ConstantMixin(object):
             self.assertEqual(resp.status_code, 201)
         return resp
 
-    def create_bookmark(self, url, title, tags, user_id, verify=True):
-        site = url.split("//")[1].split("/")[0]
+    def create_bookmark(self, url, title, site=None, tags=[], verify=True):
         bookmark_data = {
             "url": url,
             "title": title,
-            "site": site,
             "tags": tags,
-            "user": user_id,
         }
+        if site:
+            bookmark_data["site"] = site
         resp = self.client.post(self.BOOKMARK_URL, bookmark_data, format="json")
         if verify:
             self.assertEqual(resp.status_code, 201)
+        return resp
+
+    def update_bookmark(self, bookmark_id, bookmark_data, patch=False, verify=True):
+        if patch:
+            resp = self.client.patch(
+                f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
+            )
+        else:
+            resp = self.client.put(
+                f"{self.BOOKMARK_URL}/{bookmark_id}", bookmark_data, format="json"
+            )
+        if verify:
+            self.assertEqual(resp.status_code, 200)
+        return resp
+
+    def delete_bookmark(self, bookmark_id, verify=True):
+        resp = self.client.delete(f"{self.BOOKMARK_URL}/{bookmark_id}")
+        if verify:
+            self.assertEqual(resp.status_code, 204)
         return resp

@@ -5,13 +5,13 @@ from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.contrib.auth import login
 
-from bookmark_app.api.serializers import UserSerializer
-from bookmark_app.models import UserOTP
-
 from rest_framework import status
 
 
 def send_or_verify_otp(request, user, otp=None, resent=False):
+    from bookmark_app.api.serializers import UserSerializer
+    from bookmark_app.models import UserOTP
+
     resp_data = UserSerializer(user).data
     user_otp = UserOTP.objects.filter(user=user).first()
     if not user_otp:
@@ -78,3 +78,23 @@ def send_otp(user, user_otp):
               from_email=settings.EMAIL_HOST_USER,
               recipient_list=[user.email],
               fail_silently=False)
+
+
+def site_extractor(link):
+    if not link:
+        return None
+    site = None
+    have_protocol = link.startswith('http')
+    dot_split = link.split('.')
+    count_dots = len(dot_split)
+    if count_dots == 3:
+        site = dot_split[1]
+        return site
+
+    if have_protocol and (count_dots == 2):
+        site = dot_split[0].split('//')[1]
+    elif count_dots == 2:
+        site = dot_split[0]
+    else:
+        return None
+    return site

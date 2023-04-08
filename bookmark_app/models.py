@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from bookmark_app.models_manager import UserManager
+from utils.helper_functions import site_extractor
 
 
 class TimeBaseModel(models.Model):
@@ -24,6 +25,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+    def save(self, **kwargs):
+        self.clean()
+        return super().save(**kwargs)
 
     def clean(self):
         super().clean()
@@ -71,3 +76,13 @@ class Bookmark(TimeBaseModel):
 
     def __str__(self):
         return f"{self.site}: {self.title}"
+
+    def save(self, **kwargs):
+        self.clean()
+        return super().save(**kwargs)
+
+    def clean(self):
+        super().clean()
+        site = site_extractor(self.url)
+        if self.site != site:
+            self.site = site
