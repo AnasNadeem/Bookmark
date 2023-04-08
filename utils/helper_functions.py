@@ -81,6 +81,8 @@ def send_otp(user, user_otp):
 
 
 def site_extractor(link):
+    if not link:
+        return None
     site = None
     have_protocol = link.startswith('http')
     dot_split = link.split('.')
