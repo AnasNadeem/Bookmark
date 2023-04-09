@@ -192,14 +192,7 @@ class BookmarkViewSet(BaseModelViewSet):
         if not tags:
             return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        for tag in tags:
-            if not isinstance(tag, dict):
-                continue
-            name = tag.get('name', '')
-            if not name:
-                continue
-            tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
-            serializer.instance.tags.add(tag_obj)
+        self._set_tags(request, tags, serializer.instance)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
@@ -211,14 +204,7 @@ class BookmarkViewSet(BaseModelViewSet):
         # HACK: This is a hack to remove all tags and add new tags
         if not partial:
             serializer.instance.tags.clear()
-        for tag in tags:
-            if not isinstance(tag, dict):
-                continue
-            name = tag.get('name', '')
-            if not name:
-                continue
-            tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
-            serializer.instance.tags.add(tag_obj)
+        self._set_tags(request, tags, serializer.instance)
         return response.Response(serializer.data)
 
     def _set_site(self, request):
@@ -231,3 +217,14 @@ class BookmarkViewSet(BaseModelViewSet):
         site_obj, created = Site.objects.get_or_create(name=site, user=request.user)
         request.data['site'] = site_obj.id
         return request
+
+    def _set_tags(self, request, tags, instance):
+        for tag in tags:
+            if not isinstance(tag, dict):
+                continue
+            name = tag.get('name', '')
+            if not name:
+                continue
+            tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
+            instance.tags.add(tag_obj)
+        return instance
