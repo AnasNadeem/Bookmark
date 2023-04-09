@@ -178,6 +178,13 @@ class SiteViewSet(BaseModelViewSet):
         serializer = self._create(request, *args, **kwargs)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
+    @action(detail=True, methods=['get'])
+    def bookmarks(self, request, pk=None):
+        site = self.get_object()
+        bookmarks = site.bookmark_set.all()
+        serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
+        return response.Response(serializer.data)
+
 
 class BookmarkViewSet(BaseModelViewSet):
     queryset = Bookmark.objects.all()

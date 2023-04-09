@@ -64,7 +64,7 @@ class Tag(TimeBaseModel):
 
 class Site(models.Model):
     name = models.CharField(max_length=100)
-    icon_url = models.URLField()
+    icon_url = models.URLField(blank=True)
     icon = models.ImageField(upload_to='images/', null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
