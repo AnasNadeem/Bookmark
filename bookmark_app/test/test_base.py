@@ -16,6 +16,9 @@ class ConstantMixin(object):
     # TagViewSet URLs
     TAG_URL = "/api/tag"
 
+    # SiteViewSet URLs
+    SITE_URL = "/api/site"
+
     # BookmarkViewSet URLs
     BOOKMARK_URL = "/api/bookmark"
 
@@ -43,6 +46,13 @@ class ConstantMixin(object):
     def create_tag(self, name, verify=True):
         tag_data = {"name": name}
         resp = self.client.post(self.TAG_URL, tag_data, format="json")
+        if verify:
+            self.assertEqual(resp.status_code, 201)
+        return resp
+
+    def create_site(self, name, verify=True):
+        tag_data = {"name": name}
+        resp = self.client.post(self.SITE_URL, tag_data, format="json")
         if verify:
             self.assertEqual(resp.status_code, 201)
         return resp

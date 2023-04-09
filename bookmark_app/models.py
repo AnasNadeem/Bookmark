@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from bookmark_app.models_manager import UserManager
-from utils.helper_functions import site_extractor
 
 
 class TimeBaseModel(models.Model):
@@ -63,10 +62,23 @@ class Tag(TimeBaseModel):
         return f"{self.name}"
 
 
+class Site(models.Model):
+    name = models.CharField(max_length=100)
+    icon_url = models.URLField(blank=True)
+    icon = models.ImageField(upload_to='images/', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('name', 'user')
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Bookmark(TimeBaseModel):
     url = models.URLField()
     title = models.TextField()
-    site = models.CharField(max_length=100)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, related_name='bookmarks', blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField(blank=True)
@@ -77,13 +89,3 @@ class Bookmark(TimeBaseModel):
 
     def __str__(self):
         return f"{self.site}: {self.title}"
-
-    def save(self, **kwargs):
-        self.clean()
-        return super().save(**kwargs)
-
-    def clean(self):
-        super().clean()
-        site = site_extractor(self.url)
-        if self.site != site:
-            self.site = site
