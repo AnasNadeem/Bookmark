@@ -1,6 +1,6 @@
 import copy
 
-from bookmark_app.models import Bookmark, Tag
+from bookmark_app.models import (Bookmark, Site, Tag)
 from .test_base import ConstantMixin
 from rest_framework.test import APITestCase
 
@@ -46,7 +46,8 @@ class TestBookmark(APITestCase, ConstantMixin):
         )
         self.assertEqual(bookmark_resp.status_code, 201)
         self.assertEqual(Bookmark.objects.all().count(), 1)
-        self.assertEqual(Bookmark.objects.all().first().site, 'google')
+        self.assertEqual(Bookmark.objects.all().first().site.name, 'google')
+        self.assertEqual(Site.objects.all().count(), 1)
 
     def test_post_without_site(self):
         # If site is not provided, it will be set correctly
@@ -59,7 +60,7 @@ class TestBookmark(APITestCase, ConstantMixin):
         )
         self.assertEqual(bookmark_resp.status_code, 201)
         self.assertEqual(Bookmark.objects.all().count(), 1)
-        self.assertEqual(Bookmark.objects.all().first().site, 'google')
+        self.assertEqual(Bookmark.objects.all().first().site.name, 'google')
 
     def test_post_with_new_tags(self):
         self.register_user()
@@ -139,7 +140,7 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmark_resp.status_code, 400)
         bookmark = Bookmark.objects.first()
         self.assertEqual(bookmark.title, 'Google Search')
-        self.assertEqual(bookmark.site, 'google')
+        self.assertEqual(bookmark.site.name, 'google')
 
     def test_put_with_full_data(self):
         self.register_user()
@@ -160,7 +161,7 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmark_resp.status_code, 200)
         bookmark = Bookmark.objects.first()
         self.assertEqual(bookmark.title, 'Bing Search')
-        self.assertEqual(bookmark.site, 'bing')
+        self.assertEqual(bookmark.site.name, 'bing')
 
     def test_put_with_new_tags(self):
         self.register_user()
@@ -185,6 +186,7 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmrks.count(), 1)
         self.assertEqual(tags.count(), 2)
         self.assertEqual(bookmrks.first().tags.count(), 2)
+        self.assertEqual(Site.objects.all().count(), 1)
 
     def test_put_with_existing_tags(self):
         self.register_user()
@@ -236,13 +238,17 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmark_resp.status_code, 403)
         self.assertEqual(Bookmark.objects.first().title, 'Google Search')
 
-    def test_patch(self):
+    def test_patch_with_incorrect_title(self):
         self.register_user()
         self.login_user()
         bookmark = self.create_bookmark(
             url='https://www.google.com',
             title='Google Search',
         )
+        self.assertEqual(Bookmark.objects.first().title, 'Google Search')
+        self.assertEqual(Bookmark.objects.first().site.name, 'google')
+        self.assertEqual(Site.objects.all().count(), 1)
+
         bookmark_data = {
             'title': 'Bing Search',
         }
@@ -254,8 +260,9 @@ class TestBookmark(APITestCase, ConstantMixin):
         )
         self.assertEqual(bookmark_resp.status_code, 200)
         self.assertEqual(Bookmark.objects.first().title, 'Bing Search')
-        self.assertEqual(Bookmark.objects.first().site, 'google')
+        self.assertEqual(Bookmark.objects.first().site.name, 'google')
         self.assertEqual(Bookmark.objects.first().url, 'https://www.google.com')
+        self.assertEqual(Site.objects.all().count(), 1)
 
     def test_patch_with_tags(self):
         self.register_user()
@@ -283,6 +290,9 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmarks.count(), 1)
         self.assertEqual(tags.count(), 3)
         self.assertEqual(bookmarks.first().tags.count(), 3)
+        self.assertEqual(bookmarks.first().tags.first().name, 'test')
+        self.assertEqual(bookmarks.first().tags.last().name, 'engine')
+        self.assertEqual(Site.objects.all().count(), 1)
 
     ######################
     # ---- DELETE ---- #
@@ -315,6 +325,7 @@ class TestBookmark(APITestCase, ConstantMixin):
         )
         self.assertEqual(bookmark_resp.status_code, 204)
         self.assertEqual(Bookmark.objects.all().count(), 0)
+        self.assertEqual(Site.objects.all().count(), 1)
 
     def test_delete_check_tags(self):
         self.register_user()
@@ -335,3 +346,4 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmark_resp.status_code, 204)
         self.assertEqual(Bookmark.objects.all().count(), 0)
         self.assertEqual(Tag.objects.all().count(), 2)
+        self.assertEqual(Site.objects.all().count(), 1)

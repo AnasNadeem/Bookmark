@@ -9,6 +9,8 @@ from .serializers import (
     # Bookmark
     BookmarkSerializer,
     BookmarkSerializerWithoutTagSerializer,
+    # Site
+    SiteSerializer,
     # Tag
     TagSerializer,
     # User
@@ -20,7 +22,7 @@ from .serializers import (
     UserEmailSerializer,
     UserSerializer,
 )
-from bookmark_app.models import (User, Bookmark, Tag)
+from bookmark_app.models import (Bookmark, Site, Tag, User)
 from utils.helper_functions import send_or_verify_otp, site_extractor
 from utils.permissions import (IsAuthenticated,
                                UserPermission,
@@ -166,6 +168,17 @@ class TagViewSet(BaseModelViewSet):
         return response.Response(serializer.data)
 
 
+class SiteViewSet(BaseModelViewSet):
+    queryset = Site.objects.all()
+    serializer_class = SiteSerializer
+    permission_classes = (UserPermission,)
+
+    def create(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
+        serializer = self._create(request, *args, **kwargs)
+        return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
 class BookmarkViewSet(BaseModelViewSet):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
@@ -173,10 +186,7 @@ class BookmarkViewSet(BaseModelViewSet):
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
-        site = site_extractor(request.data.get('url', ''))
-        if not site:
-            return response.Response({'error': 'Invalid url'}, status=status.HTTP_400_BAD_REQUEST)
-        request.data['site'] = site
+        request = self._set_site(request)
         serializer = self._create(request, *args, **kwargs)
         tags = request.data.get('tags', [])
         if not tags:
@@ -193,6 +203,7 @@ class BookmarkViewSet(BaseModelViewSet):
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
+        request = self._set_site(request)
         serializer, partial = self._update(request, *args, **kwargs)
         tags = request.data.get('tags', [])
         if not tags:
@@ -209,3 +220,14 @@ class BookmarkViewSet(BaseModelViewSet):
             tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
             serializer.instance.tags.add(tag_obj)
         return response.Response(serializer.data)
+
+    def _set_site(self, request):
+        url = request.data.get('url', '')
+        if not url:
+            return request
+        site = site_extractor(url)
+        if not site:
+            return response.Response({'error': 'Invalid url'}, status=status.HTTP_400_BAD_REQUEST)
+        site_obj, created = Site.objects.get_or_create(name=site, user=request.user)
+        request.data['site'] = site_obj.id
+        return request

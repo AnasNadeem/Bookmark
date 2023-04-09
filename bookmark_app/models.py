@@ -63,10 +63,23 @@ class Tag(TimeBaseModel):
         return f"{self.name}"
 
 
+class Site(models.Model):
+    name = models.CharField(max_length=100)
+    icon_url = models.URLField()
+    icon = models.ImageField(upload_to='images/', null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('name', 'user')
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 class Bookmark(TimeBaseModel):
     url = models.URLField()
     title = models.TextField()
-    site = models.CharField(max_length=100)
+    site = models.ForeignKey(Site, on_delete=models.CASCADE)
     tags = models.ManyToManyField(Tag, related_name='bookmarks', blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     note = models.TextField(blank=True)
@@ -85,5 +98,5 @@ class Bookmark(TimeBaseModel):
     def clean(self):
         super().clean()
         site = site_extractor(self.url)
-        if self.site != site:
-            self.site = site
+        if self.site.name != site:
+            self.site.name = site
