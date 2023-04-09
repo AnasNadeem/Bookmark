@@ -257,6 +257,33 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(Bookmark.objects.first().site, 'google')
         self.assertEqual(Bookmark.objects.first().url, 'https://www.google.com')
 
+    def test_patch_with_tags(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+            tags=[{'name': 'test'}],
+        )
+        bookmark_data = {
+            'tags': [
+                {'name': 'search'},
+                {'name': 'engine'},
+            ]
+        }
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            patch=True,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 200)
+        bookmarks = Bookmark.objects.all()
+        tags = Tag.objects.all()
+        self.assertEqual(bookmarks.count(), 1)
+        self.assertEqual(tags.count(), 3)
+        self.assertEqual(bookmarks.first().tags.count(), 3)
+
     ######################
     # ---- DELETE ---- #
     ######################

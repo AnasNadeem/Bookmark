@@ -43,7 +43,7 @@ class BaseModelViewSet(ModelViewSet):
 
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
-        return serializer
+        return serializer, partial
 
 
 class UserViewset(ModelViewSet):
@@ -193,12 +193,13 @@ class BookmarkViewSet(BaseModelViewSet):
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
-        serializer = self._update(request, *args, **kwargs)
+        serializer, partial = self._update(request, *args, **kwargs)
         tags = request.data.get('tags', [])
         if not tags:
             return response.Response(serializer.data)
         # HACK: This is a hack to remove all tags and add new tags
-        serializer.instance.tags.clear()
+        if not partial:
+            serializer.instance.tags.clear()
         for tag in tags:
             if not isinstance(tag, dict):
                 continue
