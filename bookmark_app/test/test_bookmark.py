@@ -162,6 +162,58 @@ class TestBookmark(APITestCase, ConstantMixin):
         self.assertEqual(bookmark.title, 'Bing Search')
         self.assertEqual(bookmark.site, 'bing')
 
+    def test_put_with_new_tags(self):
+        self.register_user()
+        self.login_user()
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+        )
+
+        tag1 = {'name': 'search'}
+        tag2 = {'name': 'engine'}
+        bookmark_data = copy.deepcopy(bookmark.json())
+        bookmark_data['tags'] = [tag1, tag2]
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 200)
+        bookmrks = Bookmark.objects.all()
+        tags = Tag.objects.all()
+        self.assertEqual(bookmrks.count(), 1)
+        self.assertEqual(tags.count(), 2)
+        self.assertEqual(bookmrks.first().tags.count(), 2)
+
+    def test_put_with_existing_tags(self):
+        self.register_user()
+        self.login_user()
+        tag1 = {'name': 'search'}
+        bookmark = self.create_bookmark(
+            url='https://www.google.com',
+            title='Google Search',
+            tags=[tag1],
+            verify=False
+        )
+        bookmarks = Bookmark.objects.all()
+        self.assertEqual(bookmarks.first().tags.count(), 1)
+        self.assertEqual(bookmarks.first().tags.first().name, 'search')
+
+        tag2 = {'name': 'engine'}
+        bookmark_data = copy.deepcopy(bookmark.json())
+        bookmark_data['tags'] = [tag2]
+        bookmark_resp = self.update_bookmark(
+            bookmark_id=bookmark.json()['id'],
+            bookmark_data=bookmark_data,
+            verify=False
+        )
+        self.assertEqual(bookmark_resp.status_code, 200)
+        bookmarks = Bookmark.objects.all()
+        self.assertEqual(bookmarks.first().tags.count(), 1)
+        self.assertEqual(bookmarks.first().tags.first().name, 'engine')
+        self.assertEqual(Tag.objects.count(), 2)
+
     ######################
     # ---- PATCH ---- #
     ######################

@@ -34,6 +34,17 @@ class BaseModelViewSet(ModelViewSet):
         self.perform_create(serializer)
         return serializer
 
+    def _update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            instance._prefetched_objects_cache = {}
+        return serializer
+
 
 class UserViewset(ModelViewSet):
     queryset = User.objects.all()
@@ -180,3 +191,20 @@ class BookmarkViewSet(BaseModelViewSet):
             tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
             serializer.instance.tags.add(tag_obj)
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        serializer = self._update(request, *args, **kwargs)
+        tags = request.data.get('tags', [])
+        if not tags:
+            return response.Response(serializer.data)
+        # HACK: This is a hack to remove all tags and add new tags
+        serializer.instance.tags.clear()
+        for tag in tags:
+            if not isinstance(tag, dict):
+                continue
+            name = tag.get('name', '')
+            if not name:
+                continue
+            tag_obj, created = Tag.objects.get_or_create(name=name, user=request.user)
+            serializer.instance.tags.add(tag_obj)
+        return response.Response(serializer.data)
