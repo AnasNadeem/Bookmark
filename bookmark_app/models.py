@@ -69,7 +69,7 @@ class Bookmark(TimeBaseModel):
     site = models.CharField(max_length=100)
     tags = models.ManyToManyField(Tag, related_name='bookmarks', blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # note = models.TextField(blank=True)
+    note = models.TextField(blank=True)
 
     class Meta:
         unique_together = ('url', 'user')
