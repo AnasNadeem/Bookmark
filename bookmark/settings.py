@@ -62,7 +62,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'utils.middlewares.LoginMiddleware',
 ]
 
@@ -90,8 +89,9 @@ CORS_ALLOWED_ORIGINS = [
     "chrome-extension://*",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",
 ]
-CORS_URLS_REGEX = r"^/api/.*$"
+# CORS_URLS_REGEX = r"^/api/.*$"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
