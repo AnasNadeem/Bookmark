@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # Our apps
     'bookmark_app',
+    'marketing',
 ]
 
 AUTH_USER_MODEL = 'bookmark_app.User'

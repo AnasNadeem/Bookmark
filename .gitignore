@@ -24,3 +24,6 @@ temp/
 
 # Database
 db.sqlite3
+
+# Media
+media/
