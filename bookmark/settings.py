@@ -86,6 +86,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'bookmark.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
+    "chrome-extension://*",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
