@@ -1,5 +1,10 @@
 from django.http import JsonResponse
 from .models import ExtensionPackage
+from django.shortcuts import render
+
+
+def index(request):
+    return render(request, 'index.html')
 
 
 def extension_package(request):
