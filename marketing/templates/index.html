@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EaseMyLink</title>
+</head>
+<style>
+    body{
+        background-color: #000;
+        color: #fff;
+        text-align: center;
+        font-family: sans-serif;
+    }
+    .webH1{
+        font-size: 3rem;
+    }
+    .topHeading{
+        margin-top: 5%;
+    }
+    .webP{
+        font-size: 1.5rem;
+        margin-top: 2rem;
+    }
+    button{
+        padding: 1rem 2rem;
+        font-size: 1.5rem;
+        background-color: #fff;
+        color: #000;
+        border: none;
+        border-radius: 1rem;
+        cursor: pointer;
+    }
+    .registerModal{
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .registerModalContent{
+        background-color: #fefefe;
+        margin: auto;
+        margin-top: 5rem;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 25rem;
+    }
+    .close{
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus{
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .modalH1{
+        color: #000;
+        text-align: center;
+    }
+    .modalP{
+        color: #000;
+        text-align: center;
+    }
+    form{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    input{
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .modalBtn{
+        width: 100%;
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .modalBtn:hover{
+        background-color: #45a049;
+    }
+    #verifyOTPSectionId{
+        display: none;
+    }
+    #successRegistrationSectionId{
+        display: none;
+    }
+</style>
+<body>
+    <h1 class="webH1 topHeading">Tired of losing important links!!</h1>
+    <video src="{%static 'images/link_lost.mp4' %}" autoplay loop muted></video>
+
+    <p class="webP">No worries!! Let's update the way to save a link</p>
+    <button id="startNowBtn">Start Now</button>
+    <h1 class="webH1">EasemyLink - save links with easy retrieval in the future</h1>
+
+    <div class="registerModal">
+        <div class="registerModalContent">
+            <span class="close">&times;</span>
+            <div id="registerSectionId">
+                <h2 class="modalH1">Register to continue</h2>
+                <form id="registerFormId">
+                    <input type="email" name="email" id="emailInput" placeholder="Email" required>
+                    <input type="password" name="password" id="passwordInput" placeholder="Password" required>
+                    <input type="password" name="confirmPassword" id="confirmPasswordInput" placeholder="Confirm Password" required>
+                    <button type="submit" class="modalBtn">Register</button>
+                </form>
+            </div>
+
+            <div id="verifyOTPSectionId">
+                <h2 class="modalH1">Verify OTP</h2>
+                <form id="otpFormId">
+                    <input type="text" name="otp" id="otpInput" placeholder="Verify OTP" required>
+                    <button type="submit" class="modalBtn">Verify OTP</button>
+                </form>
+            </div>
+
+            <div id="successRegistrationSectionId">
+                <h2 class="modalH1">Hurrah!! Registration Successful</h2>
+                <p class="modalP">EaseMyLink extension should have started downloading automatically. If not, please click on the below button to download the extension.</p>
+                <button class="modalBtn" id="downloadExtensionId">Download Extension</button>
+                <p class="modalP">
+                    <b>Note:</b> Webapp is in progress. I'll mail you once it's ready.
+                    <br>
+                    Until then, you can use the extension to save links.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('video').playbackRate = 0.5;
+
+        var startNowBtn = document.getElementById("startNowBtn");
+        var registerModal = document.querySelector(".registerModal");
+        var close = document.querySelector(".close");
+
+        startNowBtn.onclick = function(){
+            registerModal.style.display = "block";
+        }
+
+        close.onclick = function(){
+            registerModal.style.display = "none";
+        }
+
+        window.onclick = function(event){
+            if(event.target == registerModal){
+                registerModal.style.display = "none";
+            }
+        }
+    </script>
+    <script src="{%static 'js/scripts.js' %}"></script>
+</body>
+</html>

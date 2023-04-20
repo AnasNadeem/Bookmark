@@ -62,7 +62,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'utils.middlewares.LoginMiddleware',
 ]
 
@@ -71,7 +70,7 @@ ROOT_URLCONF = 'bookmark.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,10 +87,13 @@ WSGI_APPLICATION = 'bookmark.wsgi.application'
 
 CORS_ALLOWED_ORIGINS = [
     "chrome-extension://*",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",
 ]
-CORS_URLS_REGEX = r"^/api/.*$"
+# CORS_URLS_REGEX = r"^/api/.*$"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

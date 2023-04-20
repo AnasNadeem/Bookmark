@@ -6,7 +6,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('bookmark_app.api.urls')),
-    path('marketing/', include('marketing.urls')),
+    path('', include('marketing.urls')),
 ]
 
 if settings.DEBUG:
