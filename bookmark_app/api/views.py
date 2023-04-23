@@ -154,6 +154,7 @@ class TagViewSet(BaseModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = (UserPermission,)
+    filterset_fields = ('name',)
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
@@ -190,6 +191,7 @@ class BookmarkViewSet(BaseModelViewSet):
     queryset = Bookmark.objects.all()
     serializer_class = BookmarkSerializer
     permission_classes = (UserPermission,)
+    filterset_fields = ('id', 'url',)
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
