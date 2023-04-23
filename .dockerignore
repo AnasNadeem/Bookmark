@@ -24,11 +24,6 @@ temp/
 
 # Database
 db.sqlite3
-postgres-data/
-postgres_data/
 
 # Media
 media/
-
-# Docker
-docker-compose.yml
