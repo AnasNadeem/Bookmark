@@ -12,7 +12,7 @@ def send_or_verify_otp(request, user, otp=None, resent=False):
     from bookmark_app.api.serializers import UserSerializer
     from bookmark_app.models import UserOTP
 
-    resp_data = UserSerializer(user).data
+    resp_data = {}
     user_otp = UserOTP.objects.filter(user=user).first()
     if not user_otp:
         random_str = get_random_string(6)
@@ -20,7 +20,10 @@ def send_or_verify_otp(request, user, otp=None, resent=False):
         user_otp.user = user
         user_otp.otp = random_str
         user_otp.save()
+
         send_otp(user, user_otp)
+        resp_data = {}
+        resp_data['email'] = user.email
         resp_data['message'] = f'OTP has been sent to {user.email}.'
         resp_status = status.HTTP_200_OK
         return resp_data, resp_status
@@ -45,6 +48,7 @@ def send_or_verify_otp(request, user, otp=None, resent=False):
 
     if (not otp) and (not user_otp.is_verified):
         send_otp(user, user_otp)
+        resp_data['email'] = user.email
         resp_data['message'] = f'OTP has been sent to {user.email}.'
         resp_status = status.HTTP_200_OK
         return resp_data, resp_status
@@ -64,6 +68,7 @@ def send_or_verify_otp(request, user, otp=None, resent=False):
     else:
         user_otp.otp = get_random_string(6)
         user_otp.save()
+
         send_otp(user, user_otp)
         resp_data = {'error': 'Invalid OTP. Resending OTP. Check email.'}
         resp_status = status.HTTP_400_BAD_REQUEST

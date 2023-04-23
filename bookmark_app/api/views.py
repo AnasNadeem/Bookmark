@@ -1,6 +1,7 @@
 import jwt
 
 from django.conf import settings
+from django.contrib.auth import authenticate
 from rest_framework import response, status
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
@@ -56,6 +57,7 @@ class UserViewset(ModelViewSet):
     def get_permissions(self):
         user_permission_map = {
             "update": UserPermission,
+            "forget_password": UserPermission,
             'list': IsAuthenticated,
         }
         if self.action in user_permission_map:
@@ -85,16 +87,9 @@ class UserViewset(ModelViewSet):
     @action(detail=False, methods=['post'])
     def login(self, request):
         data = request.data
-        email = data.get('email', '')
-        password = data.get('password', '')
-        user = User.objects.filter(email=email).first()
+        user = authenticate(**data)
         if not user:
-            return response.Response({'error': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-
-        authenticated = user.check_password(password)
-        if not authenticated:
             return response.Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-
         resp_data, resp_status = send_or_verify_otp(request, user)
         return response.Response(resp_data, status=resp_status)
 
