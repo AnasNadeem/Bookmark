@@ -29,6 +29,3 @@ postgres_data/
 
 # Media
 media/
-
-# Docker
-docker-compose.yml
