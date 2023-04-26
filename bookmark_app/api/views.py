@@ -168,6 +168,17 @@ class TagViewSet(BaseModelViewSet):
         serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
         return response.Response(serializer.data)
 
+    @action(detail=False, methods=['put'])
+    def tags_in(self, request):
+        data = request.data
+        tag_names = data.get('name', [])
+        if not tag_names:
+            return response.Response({'error': 'Tag names cannot be blank.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        tags = Tag.objects.filter(name__in=tag_names, user=request.user)
+        serializer = TagSerializer(tags, many=True)
+        return response.Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class SiteViewSet(BaseModelViewSet):
     queryset = Site.objects.all()
@@ -205,6 +216,7 @@ class BookmarkViewSet(BaseModelViewSet):
         return response.Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
+        request.data['user'] = request.user.id
         request = self._set_site(request)
         serializer, partial = self._update(request, *args, **kwargs)
         tags = request.data.get('tags', [])
