@@ -8,7 +8,7 @@ from rest_framework.viewsets import ModelViewSet
 from .serializers import (
     # Bookmark
     BookmarkSerializer,
-    BookmarkSerializerWithoutTagSerializer,
+    # BookmarkSerializerWithoutTagSerializer,
     # Site
     SiteSerializer,
     # Tag
@@ -165,7 +165,7 @@ class TagViewSet(BaseModelViewSet):
     def bookmarks(self, request, pk=None):
         tag = self.get_object()
         bookmarks = tag.bookmarks.all()
-        serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
+        serializer = BookmarkSerializer(bookmarks, many=True)
         return response.Response(serializer.data)
 
     @action(detail=False, methods=['put'])
@@ -194,7 +194,7 @@ class SiteViewSet(BaseModelViewSet):
     def bookmarks(self, request, pk=None):
         site = self.get_object()
         bookmarks = site.bookmark_set.all()
-        serializer = BookmarkSerializerWithoutTagSerializer(bookmarks, many=True)
+        serializer = BookmarkSerializer(bookmarks, many=True)
         return response.Response(serializer.data)
 
 
