@@ -61,6 +61,10 @@ class Tag(TimeBaseModel):
     def __str__(self):
         return f"{self.name}"
 
+    @property
+    def bookmark_count(self):
+        return self.bookmarks.count()
+
 
 class Site(models.Model):
     name = models.CharField(max_length=100)

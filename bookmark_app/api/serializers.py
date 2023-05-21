@@ -106,6 +106,18 @@ class TagSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TagSerializerWithBookmarkCount(serializers.ModelSerializer):
+    bookmark_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Tag
+        fields = (
+            'id',
+            'name',
+            'bookmark_count',
+        )
+
+
 ######################
 # ---- SITE ---- #
 ######################

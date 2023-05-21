@@ -13,6 +13,7 @@ from .serializers import (
     SiteSerializer,
     # Tag
     TagSerializer,
+    TagSerializerWithBookmarkCount,
     # User
     ChangePasswordSerializer,
     LoginSerializer,
@@ -155,6 +156,13 @@ class TagViewSet(BaseModelViewSet):
     serializer_class = TagSerializer
     permission_classes = (UserPermission,)
     filterset_fields = ('name',)
+
+    def get_serializer_class(self):
+        tag_serializer_map = {
+            'list': TagSerializerWithBookmarkCount,
+            'retrieve': TagSerializerWithBookmarkCount,
+        }
+        return tag_serializer_map.get(self.action.lower(), TagSerializer)
 
     def create(self, request, *args, **kwargs):
         request.data['user'] = request.user.id
